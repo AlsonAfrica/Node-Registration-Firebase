@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './Update.css';
+import '../Styles/Update.css';
 
 const Update = ({ onUpdateAdmin }) => {
   const [username, setUsername] = useState('');

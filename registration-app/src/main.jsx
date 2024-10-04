@@ -4,19 +4,19 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { EmployeeProvider } from './contexts/EmployeeContext';  // Correct path to EmployeeContext
-import Loginpage from './Component/Loginpage';
-import RegisterPage from './Component/RegisterPage.jsx';
-import HomePage from './Component/HomePage.jsx';
-import FormPage from './Component/FormPage.jsx';
+import Loginpage from './Pages/Loginpage.jsx';
+import RegisterPage from './Pages/RegisterPage.jsx';
+import HomePage from './Pages/HomePage.jsx';
+import FormPage from './Pages/FormPage.jsx';
 import EmployeeForm from './Component/EmployeeForm';
 import EmployeeManagement from './Component/EmployeeManagement';
-import UpdatePage from './Component/UpdatePage';
+import UpdatePage from './Pages/UpdatePage';
 import Update from './Component/Update';
 
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <Loginpage />,
+    element: <Loginpage/>,
     errorElement: <div>404 Not Found</div>,
   },
   {

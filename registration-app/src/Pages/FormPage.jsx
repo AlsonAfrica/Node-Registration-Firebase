@@ -1,5 +1,5 @@
-import Navbar from "./Navbar";
-import FormEmployee from "./EmployeeForm";
+import Navbar from "../Component/Navbar";
+import FormEmployee from "../Component/EmployeeForm";
 const FormPage = () => {
     return ( 
         <div>

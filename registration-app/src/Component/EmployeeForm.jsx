@@ -1,7 +1,7 @@
 // src/Component/EmployeeForm.jsx
 import React, { useState } from 'react';
 import { useEmployeeContext } from '../contexts/EmployeeContext';
-import './EmployeeForm.css';
+import '../Styles/EmployeeForm.css';
 import { IoMdPersonAdd } from "react-icons/io";
 
 const FormEmployee = () => {

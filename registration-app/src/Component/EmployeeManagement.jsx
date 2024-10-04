@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useEmployeeContext } from '../contexts/EmployeeContext';
-import './EmployeeManagement.css';
+import '../Styles/EmployeeManagement.css';
 import EditEmployeeForm from './EditEmployeeForm';
 
 const EmployeeManagement = () => {

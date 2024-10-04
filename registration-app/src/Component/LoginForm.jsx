@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import './Loginform.css';
+import '../Styles/Loginform.css'
 import { GiJumpAcross } from "react-icons/gi";
 import { SiGnuprivacyguard } from "react-icons/si";
 import { MdAdminPanelSettings } from "react-icons/md";

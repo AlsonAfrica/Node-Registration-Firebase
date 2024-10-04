@@ -1,7 +1,7 @@
 // src/Component/EditEmployeeForm.jsx
 import React, { useState, useEffect } from 'react';
 import { useEmployeeContext } from '../contexts/EmployeeContext';
-import './EmployeeForm.css';
+import '../Styles/EmployeeForm.css'
 
 const EditEmployeeForm = ({ employeeToEdit, onSave, onCancel }) => {
   const { employees, setEmployees } = useEmployeeContext();
