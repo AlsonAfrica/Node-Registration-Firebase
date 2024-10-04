@@ -20,13 +20,13 @@ const db = admin.firestore(); // Firestore reference
 app.post('/users', async (req, res) => {
     try {
         // Destructure the new fields from the request body
-        const { name, email, id, phoneNumber, position, image } = req.body;
+        const { name, email, id, phoneNumber, position, image,idNumber } = req.body;
 
         // Generate a new document reference in the 'users' collection
         const userRef = db.collection('users').doc(); // Generate unique ID
 
         // Save the new user data to Firestore
-        await userRef.set({ name, email, id, phoneNumber, position, image });
+        await userRef.set({ name, email, id, phoneNumber, position, image,idNumber });
 
         // Send a success response
         res.status(201).json({ message: 'User created successfully' });
@@ -67,8 +67,8 @@ app.get('/users/:id', async (req, res) => {
 app.put('/users/:id', async (req, res) => {
     try {
         const userRef = db.collection('users').doc(req.params.id);
-        const { name, email, phoneNumber, position, image } = req.body; // Updated fields
-        await userRef.update({ name, email, phoneNumber, position, image }); // Update fields
+        const { name, email, phoneNumber, position, image, idNumber} = req.body; // Updated fields
+        await userRef.update({ name, email, phoneNumber, position, image,idNumber }); // Update fields
         res.status(200).json({ message: 'User updated successfully' });
     } catch (error) {
         console.error(error); // Log the error for debugging
