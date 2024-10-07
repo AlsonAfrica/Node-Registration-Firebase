@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useEmployeeContext } from '../contexts/EmployeeContext';
+import { db } from '../Firebase/firebaseConfig'; // Import your Firestore config
+import { collection, getDocs } from 'firebase/firestore';
 import '../Styles/EmployeeManagement.css';
 import EditEmployeeForm from './EditEmployeeForm';
 
@@ -8,34 +10,25 @@ const EmployeeManagement = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [editingEmployee, setEditingEmployee] = useState(null);
 
-  // Load initial data from localStorage once on mount
+  // Load employees from Firestore
   useEffect(() => {
-    const storedEmployees = localStorage.getItem('currentEmployees');
-    const storedPreviousEmployees = localStorage.getItem('previousEmployees');
-
-    if (storedEmployees) {
-      setEmployees(JSON.parse(storedEmployees));
-    } else {
-      setEmployees([]); // In case nothing is stored
-    }
-
-    if (storedPreviousEmployees) {
-      setPreviousEmployees(JSON.parse(storedPreviousEmployees));
-    } else {
-      setPreviousEmployees([]); // In case nothing is stored
-    }
-  }, [setEmployees, setPreviousEmployees]);
-
-  // Save current employees to localStorage whenever `employees` changes
-  useEffect(() => {
-    if (employees.length > 0) {
+    const fetchEmployees = async () => {
       try {
-        localStorage.setItem('currentEmployees', JSON.stringify(employees));
+        const employeesCollection = collection(db, 'users');
+        const employeeSnapshot = await getDocs(employeesCollection);
+        const employeeList = employeeSnapshot.docs.map(doc => ({
+          id: doc.id, // Firestore document ID
+          idNumber: doc.data().idNumber, // Assuming `idNumber` is the field name in Firestore
+          ...doc.data() // Spread operator to get other employee data
+        }));
+        setEmployees(employeeList);
       } catch (error) {
-        console.error('Error saving current employees to localStorage:', error);
+        console.error("Error fetching employees from Firestore:", error);
       }
-    }
-  }, [employees]);
+    };
+
+    fetchEmployees();
+  }, [setEmployees]);
 
   // Save previous employees to localStorage whenever `previousEmployees` changes
   useEffect(() => {
@@ -80,7 +73,7 @@ const EmployeeManagement = () => {
   };
 
   const filteredEmployees = employees.filter((employee) =>
-    employee.id.toLowerCase().includes(searchQuery.toLowerCase())
+    employee.idNumber.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -89,7 +82,7 @@ const EmployeeManagement = () => {
       <div className="search-bar">
         <input
           type="text"
-          placeholder="Search by ID"
+          placeholder="Search by ID Number"
           value={searchQuery}
           onChange={handleSearchChange}
         />
@@ -108,7 +101,7 @@ const EmployeeManagement = () => {
               <thead>
                 <tr>
                   <th>Name</th>
-                  <th>ID</th>
+                  <th>ID Number</th> {/* Changed from ID to ID Number */}
                   <th>Email</th>
                   <th>Phone Number</th>
                   <th>Position</th>
@@ -120,7 +113,7 @@ const EmployeeManagement = () => {
                 {filteredEmployees.map((employee) => (
                   <tr key={employee.id}>
                     <td>{employee.name}</td>
-                    <td>{employee.id}</td>
+                    <td>{employee.idNumber}</td> {/* Display the idNumber here */}
                     <td>{employee.email}</td>
                     <td>{employee.phone}</td>
                     <td>{employee.position}</td>
@@ -147,7 +140,7 @@ const EmployeeManagement = () => {
               <thead>
                 <tr>
                   <th>Name</th>
-                  <th>ID</th>
+                  <th>ID Number</th> {/* Changed from ID to ID Number */}
                   <th>Email</th>
                   <th>Phone Number</th>
                   <th>Position</th>
@@ -158,7 +151,7 @@ const EmployeeManagement = () => {
                 {previousEmployees.map((employee) => (
                   <tr key={employee.id}>
                     <td>{employee.name}</td>
-                    <td>{employee.id}</td>
+                    <td>{employee.idNumber}</td> {/* Display the idNumber here */}
                     <td>{employee.email}</td>
                     <td>{employee.phone}</td>
                     <td>{employee.position}</td>
