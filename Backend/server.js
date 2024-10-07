@@ -1,16 +1,19 @@
 const express = require('express');
 const admin = require('firebase-admin');
-const bodyParser = require('body-parser');
+const cors = require('cors'); // Add CORS
 
 const app = express();
-app.use(bodyParser.json());
+app.use(cors({
+    origin: 'http://localhost:5173', // Allow requests from the specified origin
+})); // Enable CORS for cross-origin requests
+app.use(express.json()); // Use built-in middleware to parse JSON
 
 // Initialize Firebase Admin SDK with the service account key
-const serviceAccount = require('../Backend/node-registration-server-firebase-adminsdk-7yhna-e89d3eabd5.json');
+const serviceAccount = require('../Backend/node-registration-server-firebase-adminsdk-7yhna-df42b71885.json');
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
-    // The databaseURL is optional for Firestore
+    // Uncomment and set if using Realtime Database
     // databaseURL: 'https://node-registration-server.firebaseio.com' 
 });
 
@@ -19,20 +22,20 @@ const db = admin.firestore(); // Firestore reference
 // Create (POST) - Add new user
 app.post('/users', async (req, res) => {
     try {
-        // Destructure the new fields from the request body
-        const { name, email, id, phoneNumber, position, image,idNumber } = req.body;
+        const { name, email, phoneNumber, position, image, idNumber } = req.body;
 
-        // Generate a new document reference in the 'users' collection
+        // Validate request body
+        if (!name || !email || !phoneNumber || !position || !idNumber) {
+            return res.status(400).json({ error: 'All fields are required' });
+        }
+
         const userRef = db.collection('users').doc(); // Generate unique ID
 
-        // Save the new user data to Firestore
-        await userRef.set({ name, email, id, phoneNumber, position, image,idNumber });
-
-        // Send a success response
+        await userRef.set({ name, email, phoneNumber, position, image, idNumber });
         res.status(201).json({ message: 'User created successfully' });
     } catch (error) {
-        console.error(error); // Log the error for debugging
-        res.status(500).json({ error: 'Error creating user' });
+        console.error('Error creating user:', error); // Detailed error logging
+        res.status(500).json({ error: 'Error creating user', details: error.message });
     }
 });
 
@@ -43,8 +46,8 @@ app.get('/users', async (req, res) => {
         const usersList = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         res.status(200).json(usersList);
     } catch (error) {
-        console.error(error); // Log the error for debugging
-        res.status(500).json({ error: 'Error fetching users' });
+        console.error('Error fetching users:', error); // Detailed error logging
+        res.status(500).json({ error: 'Error fetching users', details: error.message });
     }
 });
 
@@ -58,8 +61,8 @@ app.get('/users/:id', async (req, res) => {
         }
         res.status(200).json({ id: userDoc.id, ...userDoc.data() });
     } catch (error) {
-        console.error(error); // Log the error for debugging
-        res.status(500).json({ error: 'Error fetching user' });
+        console.error('Error fetching user:', error); // Detailed error logging
+        res.status(500).json({ error: 'Error fetching user', details: error.message });
     }
 });
 
@@ -67,12 +70,26 @@ app.get('/users/:id', async (req, res) => {
 app.put('/users/:id', async (req, res) => {
     try {
         const userRef = db.collection('users').doc(req.params.id);
-        const { name, email, phoneNumber, position, image, idNumber} = req.body; // Updated fields
-        await userRef.update({ name, email, phoneNumber, position, image,idNumber }); // Update fields
+        const { name, email, phoneNumber, position, image, idNumber } = req.body;
+
+        // Validate request body
+        if (!name && !email && !phoneNumber && !position && !idNumber) {
+            return res.status(400).json({ error: 'At least one field must be provided' });
+        }
+
+        const updateData = {};
+        if (name) updateData.name = name;
+        if (email) updateData.email = email;
+        if (phoneNumber) updateData.phoneNumber = phoneNumber;
+        if (position) updateData.position = position;
+        if (image) updateData.image = image;
+        if (idNumber) updateData.idNumber = idNumber;
+
+        await userRef.update(updateData);
         res.status(200).json({ message: 'User updated successfully' });
     } catch (error) {
-        console.error(error); // Log the error for debugging
-        res.status(500).json({ error: 'Error updating user' });
+        console.error('Error updating user:', error); // Detailed error logging
+        res.status(500).json({ error: 'Error updating user', details: error.message });
     }
 });
 
@@ -83,12 +100,13 @@ app.delete('/users/:id', async (req, res) => {
         await userRef.delete();
         res.status(200).json({ message: 'User deleted successfully' });
     } catch (error) {
-        console.error(error); // Log the error for debugging
-        res.status(500).json({ error: 'Error deleting user' });
+        console.error('Error deleting user:', error); // Detailed error logging
+        res.status(500).json({ error: 'Error deleting user', details: error.message });
     }
 });
 
-const PORT = process.env.PORT || 5000;
+// Start the server
+const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });

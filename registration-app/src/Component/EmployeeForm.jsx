@@ -1,4 +1,3 @@
-// src/Component/EmployeeForm.jsx
 import React, { useState } from 'react';
 import { useEmployeeContext } from '../contexts/EmployeeContext';
 import '../Styles/EmployeeForm.css';
@@ -26,7 +25,7 @@ const FormEmployee = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     // Validate ID and phone number
@@ -44,23 +43,33 @@ const FormEmployee = () => {
 
     const newEmployee = {
       name,
-      id,
       email,
-      phone,
+      phoneNumber: phone,
       position,
-      picture: picture || 'https://via.placeholder.com/150'
+      image: picture || 'https://via.placeholder.com/150',
+      idNumber: id, // Adjust according to your backend field names
     };
 
-    // Simulate a network request
-    setTimeout(() => {
-      setEmployees(prevEmployees => {
-        const updatedEmployees = [...prevEmployees, newEmployee];
+    try {
+      // Post employee data to the server
+      const response = await fetch('http://localhost:5001/users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newEmployee),
+      });
 
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      // Update local state on successful response
+      const addedEmployee = await response.json();
+      setEmployees(prevEmployees => {
+        const updatedEmployees = [...prevEmployees, addedEmployee]; // Assuming server returns the created employee
         // Save to local storage
         localStorage.setItem('employees', JSON.stringify(updatedEmployees));
-        
-        // Log employee data
-        console.log('Employee added:', newEmployee);
         return updatedEmployees;
       });
 
@@ -72,14 +81,13 @@ const FormEmployee = () => {
       setPosition('');
       setPicture('');
 
-      setIsLoading(false); // Stop loading
       setIsSuccess(true);  // Show success message
-
-      // Hide success message after 3 seconds
-      setTimeout(() => {
-        setIsSuccess(false);
-      }, 3000);
-    }, 2000); // Simulate a delay (e.g., 2 seconds)
+    } catch (error) {
+      console.error('Error adding employee:', error); // Log error
+      alert('Failed to add employee.'); // Alert user
+    } finally {
+      setIsLoading(false); // Stop loading
+    }
   };
 
   return (
