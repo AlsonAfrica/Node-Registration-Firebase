@@ -60,17 +60,34 @@ const EmployeeManagement = () => {
       }
     }
   }, [previousEmployees]);
-
-  const handleDelete = (id) => {
-    const employeeToDelete = employees.find((employee) => employee.id === id);
-    if (employeeToDelete) {
-      const updatedEmployees = employees.filter((employee) => employee.id !== id);
-      const updatedPreviousEmployees = [...previousEmployees, employeeToDelete];
-
-      setEmployees(updatedEmployees);
-      setPreviousEmployees(updatedPreviousEmployees);
+ 
+  // Handle delete
+  const handleDelete = async (id) => {
+    try {
+      const response = await fetch(`http://localhost:5002/users/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to delete the employee');
+      }
+  
+      const employeeToDelete = employees.find((employee) => employee.id === id);
+      if (employeeToDelete) {
+        const updatedEmployees = employees.filter((employee) => employee.id !== id);
+        const updatedPreviousEmployees = [...previousEmployees, employeeToDelete];
+  
+        setEmployees(updatedEmployees);
+        setPreviousEmployees(updatedPreviousEmployees);
+      }
+    } catch (error) {
+      console.error('Error deleting employee:', error);
     }
   };
+  
 
   const handleEdit = (employee) => {
     setEditingEmployee(employee);
@@ -135,7 +152,7 @@ const EmployeeManagement = () => {
                     <td>{employee.name}</td>
                     <td>{employee.idNumber}</td>
                     <td>{employee.email}</td>
-                    <td>{employee.phoneNumber}</td>
+                    <td>{employee.phone}</td>
                     <td>{employee.position}</td>
                     <td>
                       <img src={employee.image} alt={employee.name} />

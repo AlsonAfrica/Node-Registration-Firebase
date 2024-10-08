@@ -8,7 +8,7 @@ const FormEmployee = () => {
   const [name, setName] = useState('');
   const [id, setId] = useState('');
   const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
+  const [phone, setPhone] = useState(''); // Change here
   const [position, setPosition] = useState('');
   const [picture, setPicture] = useState('');
   const [isLoading, setIsLoading] = useState(false); 
@@ -34,7 +34,7 @@ const FormEmployee = () => {
       return;
     }
 
-    if (!/^0\d{9}$/.test(phone)) {
+    if (!/^0\d{9}$/.test(phone)) { // Change here
       alert('Phone number must be exactly 10 digits starting with 0.');
       return;
     }
@@ -44,7 +44,7 @@ const FormEmployee = () => {
     const newEmployee = {
       name,
       email,
-      phoneNumber: phone,
+      phone, // Change here
       position,
       image: picture || 'https://via.placeholder.com/150',
       idNumber: id, // Adjust according to your backend field names
@@ -77,7 +77,7 @@ const FormEmployee = () => {
       setName('');
       setId('');
       setEmail('');
-      setPhone('');
+      setPhone(''); // Change here
       setPosition('');
       setPicture('');
 
@@ -96,14 +96,13 @@ const FormEmployee = () => {
       <input type="text" placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} required />
       <input type="text" placeholder="ID" value={id} onChange={(e) => setId(e.target.value)} required />
       <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-      <input type="text" placeholder="Phone Number" value={phone} onChange={(e) => setPhone(e.target.value)} required />
+      <input type="text" placeholder="Phone" value={phone} onChange={(e) => setPhone(e.target.value)} required /> {/* Change here */}
       <input type="text" placeholder="Position" value={position} onChange={(e) => setPosition(e.target.value)} required />
-      <input className="Image-input" type="file" onChange={handleFileChange} required />
+      <input type="file" accept="image/*" onChange={handleFileChange} />
       <button type="submit" disabled={isLoading}>
-        {isLoading ? 'Adding...' : 'Add Employee'}
+        {isLoading ? 'Adding...' : <IoMdPersonAdd />} {/* Change icon */}
       </button>
-
-      {isSuccess && <p className="success-message">Employee added successfully!</p>}
+      {isSuccess && <p>Employee added successfully!</p>}
     </form>
   );
 };

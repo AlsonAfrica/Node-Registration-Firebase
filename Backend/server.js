@@ -4,8 +4,8 @@ const cors = require('cors'); // Add CORS
 
 const app = express();
 app.use(cors({
-       origin: ['http://localhost:5174', 'http://localhost:5173'],
-       methods:['GET','POST','PUT','DELETE','OPTIONS']
+    origin: ['http://localhost:5174', 'http://localhost:5173'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
 })); // Enable CORS for cross-origin requests
 app.use(express.json()); // Use built-in middleware to parse JSON
 
@@ -23,16 +23,16 @@ const db = admin.firestore(); // Firestore reference
 // Create (POST) - Add new user
 app.post('/users', async (req, res) => {
     try {
-        const { name, email, phoneNumber, position, image, idNumber } = req.body;
+        const { name, email, phone, position, image, idNumber } = req.body; // Change here
 
         // Validate request body
-        if (!name || !email || !phoneNumber || !position || !idNumber) {
+        if (!name || !email || !phone || !position || !idNumber) { // Change here
             return res.status(400).json({ error: 'All fields are required' });
         }
 
         const userRef = db.collection('users').doc(); // Generate unique ID
 
-        await userRef.set({ name, email, phoneNumber, position, image, idNumber });
+        await userRef.set({ name, email, phone, position, image, idNumber }); // Change here
         res.status(201).json({ message: 'User created successfully' });
     } catch (error) {
         console.error('Error creating user:', error); // Detailed error logging
@@ -71,17 +71,17 @@ app.get('/users/:id', async (req, res) => {
 app.put('/users/:id', async (req, res) => {
     try {
         const userRef = db.collection('users').doc(req.params.id);
-        const { name, email, phoneNumber, position, image, idNumber } = req.body;
+        const { name, email, phone, position, image, idNumber } = req.body; // Change here
 
         // Validate request body
-        if (!name && !email && !phoneNumber && !position && !idNumber) {
+        if (!name && !email && !phone && !position && !idNumber) {
             return res.status(400).json({ error: 'At least one field must be provided' });
         }
 
         const updateData = {};
         if (name) updateData.name = name;
         if (email) updateData.email = email;
-        if (phoneNumber) updateData.phoneNumber = phoneNumber;
+        if (phone) updateData.phone = phone; // Change here
         if (position) updateData.position = position;
         if (image) updateData.image = image;
         if (idNumber) updateData.idNumber = idNumber;

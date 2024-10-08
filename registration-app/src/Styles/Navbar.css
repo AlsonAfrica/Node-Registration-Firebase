@@ -17,12 +17,6 @@
     
   }
 
-  
-  .navbar-logo img {
-    height: 60px; 
-    margin-left:20px;
-  }
-  
   .navbar-links {
     list-style-type: none;
     display: flex;
