@@ -17,9 +17,9 @@ const EmployeeManagement = () => {
         const employeesCollection = collection(db, 'users');
         const employeeSnapshot = await getDocs(employeesCollection);
         const employeeList = employeeSnapshot.docs.map(doc => ({
-          id: doc.id, // Firestore document ID
-          idNumber: doc.data().idNumber, // Assuming `idNumber` is the field name in Firestore
-          ...doc.data() // Spread operator to get other employee data
+          id: doc.id,
+          idNumber: doc.data().idNumber,
+          ...doc.data()
         }));
         setEmployees(employeeList);
       } catch (error) {
@@ -29,6 +29,26 @@ const EmployeeManagement = () => {
 
     fetchEmployees();
   }, [setEmployees]);
+
+  // Load previous employees from Firestore
+  useEffect(() => {
+    const fetchPreviousEmployees = async () => {
+      try {
+        const previousEmployeesCollection = collection(db, 'previousEmployees');
+        const previousEmployeeSnapshot = await getDocs(previousEmployeesCollection);
+        const previousEmployeeList = previousEmployeeSnapshot.docs.map(doc => ({
+          id: doc.id,
+          idNumber: doc.data().idNumber,
+          ...doc.data()
+        }));
+        setPreviousEmployees(previousEmployeeList);
+      } catch (error) {
+        console.error("Error fetching previous employees from Firestore:", error);
+      }
+    };
+
+    fetchPreviousEmployees();
+  }, [setPreviousEmployees]);
 
   // Save previous employees to localStorage whenever `previousEmployees` changes
   useEffect(() => {
@@ -101,7 +121,7 @@ const EmployeeManagement = () => {
               <thead>
                 <tr>
                   <th>Name</th>
-                  <th>ID Number</th> {/* Changed from ID to ID Number */}
+                  <th>ID Number</th>
                   <th>Email</th>
                   <th>Phone Number</th>
                   <th>Position</th>
@@ -113,12 +133,12 @@ const EmployeeManagement = () => {
                 {filteredEmployees.map((employee) => (
                   <tr key={employee.id}>
                     <td>{employee.name}</td>
-                    <td>{employee.idNumber}</td> {/* Display the idNumber here */}
+                    <td>{employee.idNumber}</td>
                     <td>{employee.email}</td>
-                    <td>{employee.phone}</td>
+                    <td>{employee.phoneNumber}</td>
                     <td>{employee.position}</td>
                     <td>
-                      <img src={employee.picture} alt={employee.name} />
+                      <img src={employee.image} alt={employee.name} />
                     </td>
                     <td className="actions">
                       <button className="edit-btn" onClick={() => handleEdit(employee)}>
@@ -140,7 +160,7 @@ const EmployeeManagement = () => {
               <thead>
                 <tr>
                   <th>Name</th>
-                  <th>ID Number</th> {/* Changed from ID to ID Number */}
+                  <th>ID Number</th>
                   <th>Email</th>
                   <th>Phone Number</th>
                   <th>Position</th>
@@ -151,12 +171,12 @@ const EmployeeManagement = () => {
                 {previousEmployees.map((employee) => (
                   <tr key={employee.id}>
                     <td>{employee.name}</td>
-                    <td>{employee.idNumber}</td> {/* Display the idNumber here */}
+                    <td>{employee.idNumber}</td>
                     <td>{employee.email}</td>
-                    <td>{employee.phone}</td>
+                    <td>{employee.phoneNumber}</td> {/* Ensure this matches the field name */}
                     <td>{employee.position}</td>
                     <td>
-                      <img src={employee.picture} alt={employee.name} />
+                      <img src={employee.image} alt={employee.name} />
                     </td>
                   </tr>
                 ))}
@@ -170,3 +190,4 @@ const EmployeeManagement = () => {
 };
 
 export default EmployeeManagement;
+

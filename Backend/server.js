@@ -4,12 +4,13 @@ const cors = require('cors'); // Add CORS
 
 const app = express();
 app.use(cors({
-    origin: 'http://localhost:5173', // Allow requests from the specified origin
+       origin: ['http://localhost:5174', 'http://localhost:5173'],
+       methods:['GET','POST','PUT','DELETE','OPTIONS']
 })); // Enable CORS for cross-origin requests
 app.use(express.json()); // Use built-in middleware to parse JSON
 
 // Initialize Firebase Admin SDK with the service account key
-const serviceAccount = require('../Backend/node-registration-server-firebase-adminsdk-7yhna-df42b71885.json');
+const serviceAccount = require('../Backend/node-registration-server-firebase-adminsdk-7yhna-e89d3eabd5.json');
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
@@ -97,8 +98,27 @@ app.put('/users/:id', async (req, res) => {
 app.delete('/users/:id', async (req, res) => {
     try {
         const userRef = db.collection('users').doc(req.params.id);
+        const userSnapshot = await userRef.get();
+
+        // Check if the user exists before attempting to delete
+        if (!userSnapshot.exists) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        const userData = userSnapshot.data(); // Get the user data
+
+        // Create a reference to the previousEmployees collection
+        const previousEmployeesRef = db.collection('previousEmployees');
+        await previousEmployeesRef.add({
+            ...userData, // Add the existing user data
+            deletedAt: new Date(), // Optionally add a timestamp
+            deletedId: req.params.id // Store the original ID for reference
+        });
+
+        // Now delete the user from the users collection
         await userRef.delete();
-        res.status(200).json({ message: 'User deleted successfully' });
+
+        res.status(200).json({ message: 'User deleted and moved to previous employees successfully' });
     } catch (error) {
         console.error('Error deleting user:', error); // Detailed error logging
         res.status(500).json({ error: 'Error deleting user', details: error.message });
@@ -106,7 +126,7 @@ app.delete('/users/:id', async (req, res) => {
 });
 
 // Start the server
-const PORT = process.env.PORT || 5001;
+const PORT = process.env.PORT || 5002;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
